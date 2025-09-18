@@ -4,7 +4,6 @@ A fully functional emulator for the Chip-8, a simple interpreted programming lan
 
 This emulator was built as a deep dive into computer architecture, low-level memory management, and CPU instruction sets.
 
-![Chip-8 Emulator Screenshot](https://i.imgur.com/example.png)  ---
 
 ### So, What is Chip-8?
 
