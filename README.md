@@ -1,82 +1,87 @@
-# Java Chip-8 Emulator
+# CHIP-8 Emulator
 
-A fully functional emulator for the Chip-8, a simple interpreted programming language from the 1970s. This project faithfully re-creates the Chip-8 virtual machine in Java, allowing it to run classic 8-bit games and programs.
+![Java Version](https://img.shields.io/badge/Java-17+-orange?style=for-the-badge&logo=java)
+![Build Status](https://img.shields.io/github/actions/workflow/status/sidhu1215/chip-8/build.yml?style=for-the-badge&logo=githubactions)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-This emulator was built as a deep dive into computer architecture, low-level memory management, and CPU instruction sets.
+A fully functional, low-level emulator for the CHIP-8 interpreted programming language. This project faithfully re-creates the CHIP-8 virtual machine in modern Java, allowing it to run classic 8-bit games and programs flawlessly. 
 
+This emulator was built as a deep dive into CPU design, memory mapping, instruction decoding, and fixed-timestep execution cycles.
 
-### So, What is Chip-8?
+## Key Features
 
-Chip-8 is a simple, interpreted, programming language which was first used on the COSMAC VIP and Telmac 1800 8-bit microcomputers in the mid-1970s. It's similar to a virtual machine or a simple "fantasy console." Because of its simplicity, writing an emulator for it is a popular and classic computer science challenge—a "Hello, World!" for emulator developers.
+*   **Robust Architecture:** Object-Oriented design separating Core emulation logic (CPU, Memory) from the Presentation layer (Swing UI, Input).
+*   **Accurate CPU Cycle Emulation:** Full Opcode set implementation supporting complex state management, subroutines, and binary-coded decimals (BCD).
+*   **Fixed-Timestep Game Loop:** A high-performance 60Hz delta-time calculation loop ensures smooth timer execution while simulating a highly accurate ~600Hz synthetic CPU tick rate.
+*   **Test-Driven Fundamentals:** Comprehensive unit tests covering Core arithmetic, CPU state updates, memory bounds, and opcode parsing.
+*   **Trace Logging:** Configurable SLF4J/Logback tracing to debug runtime register states and view opcode dispatching.
+*   **Modern Build Pipeline:** Integrated with Maven and automated GitHub Actions CI/CD workflows.
 
----
+## System Architecture
 
-### ✨ Features Implemented
+```mermaid
+graph TD
+    UI(com.sidhu.chip8.ui) -->|Render Frame| D((Display Layer))
+    UI -->|Key Bindings| K((Keypad Layer))
+    UI -->|Controls| C(com.sidhu.chip8.core.Chip8)
+    
+    C -->|Fetch & Decode| CPU[CPU]
+    C -->|Read/Write Bytes| MEM[Memory]
+    
+    CPU -->|Execute Jump/Math| CPU
+    CPU -->|Access State| MEM
+    
+    D -.->|Draw Matrix 64x32| C
+    K -.->|Read Key Interrupts| C
+```
 
-This emulator implements all the core components of the Chip-8 virtual machine:
+## Technology Stack
 
-- **CPU Emulation:** A main loop that accurately fetches, decodes, and executes opcodes.
-- **Full Opcode Set:** Complete implementation of all 35 Chip-8 opcodes, handling everything from screen drawing to memory operations.
-- **Memory:** A 4KB memory module to store the loaded game (ROM), screen data, and system state.
-- **Graphics:** A 64x32 pixel monochrome display, rendered to the screen using Java Swing.
-- **Input:** A 16-key hexadecimal keypad, mapped to the user's keyboard for game input.
-- **Timers:** Both delay and sound timers, implemented to run at the specified 60Hz.
+*   **Language:** Java 17
+*   **Build System:** Apache Maven
+*   **Testing:** JUnit 5, AssertJ
+*   **Logging:** SLF4J, Logback Classic
+*   **UI Framework:** Java Swing
 
----
+## Getting Started
 
-### 🛠️ Technology Stack
+### Prerequisites
+*   [Java 17](https://adoptium.net/) or higher.
+*   [Apache Maven](https://maven.apache.org/) (usually included in modern IDEs like IntelliJ or Eclipse).
 
-- **Core Language:** **Java**
-- **User Interface:** **Java Swing** for creating the display window and handling keyboard input.
+### Quick Build & Run
 
----
+1.  **Clone the Repository:**
+    ```bash
+    git clone https://github.com/sidhu1215/chip-8.git
+    cd chip-8
+    ```
 
-### 🚀 How to Run
+2.  **Run the Test Suite:**
+    Ensure compiling is successful and core logic works flawlessly.
+    ```bash
+    mvn clean test
+    ```
 
-**1. Prerequisites:**
-- You must have Java Development Kit (JDK) 8 or higher installed.
+3.  **Launch the Emulator:**
+    ```bash
+    mvn exec:java -Dexec.mainClass="com.sidhu.chip8.ui.GameWindow"
+    ```
+    *If no file argument is passed, a GUI File Chooser will open automatically!*
 
-**2. Clone the Repository:**
+### Running via Command Line Argument
+You can bypass the file picker by directly pointing to a `.ch8` ROM file:
 ```bash
-git clone [https://github.com/sidhu1215/chip-8.git](https://github.com/sidhu1215/chip-8.git)
-cd chip-8
+mvn exec:java -Dexec.mainClass="com.sidhu.chip8.ui.GameWindow" -Dexec.args="path/to/pong.ch8"
 ```
 
-**3. Compile the Code:**
-```bash
-# Navigate to the source directory
-cd src
-# Compile all Java files
-javac com/sidhu/chip8/*
-```
+## Keypad Mapping
 
-**4. Run the Emulator:**
-You need a Chip-8 ROM file to run. You can find many classic ROMs for free online (search for "Chip-8 ROMs").
+The original CHIP-8 hardware utilized a 16-key hexadecimal keypad (0-F). This emulator natively binds it to a standard QWERTY keyboard schema:
 
-Run the emulator from the `src` directory, passing the path to your ROM file as an argument:
-
-```bash
-java com.sidhu.chip8.Main path/to/your/rom/file.ch8
-```
-**Example:**
-```bash
-java com.sidhu.chip8.Main ../roms/PONG
-```
-
-**5. Keypad Mapping:**
-The original Chip-8 had a 16-key keypad. This emulator maps it to your keyboard as follows:
-```
-1 2 3 C  ->  1 2 3 4
-4 5 6 D  ->  Q W E R
-7 8 9 E  ->  A S D F
-A 0 B F  ->  Z X C V
-```
-
----
-
-### Project Learnings
-
-This project was a fantastic exercise in understanding the fundamentals of how a computer works at a low level, including:
-- The CPU fetch-decode-execute cycle.
-- Direct memory manipulation and memory-mapped I/O.
-- The relationship between timers, graphics, and input in a simple system.
+| CHIP-8 Keypad | Mapped To | 
+| :---: | :---: |
+| `1` `2` `3` `C` | `1` `2` `3` `4` |
+| `4` `5` `6` `D` | `Q` `W` `E` `R` |
+| `7` `8` `9` `E` | `A` `S` `D` `F` |
+| `A` `0` `B` `F` | `Z` `X` `C` `V` |
